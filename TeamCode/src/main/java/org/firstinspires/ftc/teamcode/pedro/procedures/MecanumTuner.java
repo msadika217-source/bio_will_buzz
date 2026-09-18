@@ -17,27 +17,27 @@ public class MecanumTuner extends Procedure {
     @Override
     public void run() throws InterruptedException {
         Inputs motorNames = inputs("Mecanum Motor Names", "Enter the names in HardwareMap of your drivetrain motors.");
-        Inputs.Field<String> frontLeftName = motorNames.s("Front Left Name");
-        Inputs.Field<String> frontRightName = motorNames.s("Front Right Name");
-        Inputs.Field<String> backLeftName = motorNames.s("Back Left Name");
-        Inputs.Field<String> backRightName = motorNames.s("Back Right Name");
+        Inputs.Field<String> frontLeftName = motorNames.s("FrontLeft");
+        Inputs.Field<String> frontRightName = motorNames.s("FrontRight");
+        Inputs.Field<String> backLeftName = motorNames.s("BackLeft");
+        Inputs.Field<String> backRightName = motorNames.s("BackRight");
         awaitInputs(motorNames);
 
         confirmation("Motor Directions", "Each drivetrain motor will spin, one at a time. After each one, you will enter whether it spun forward or reversed. You may use the interactive diagram to see which wheel should be spinning and which direction is forward.");
 
-        Direction frontLeftDirection = testMotor(Wheel.FRONT_LEFT, "Front Left", frontLeftName.get());
-        Direction frontRightDirection = testMotor(Wheel.FRONT_RIGHT, "Front Right", frontRightName.get());
-        Direction backLeftDirection = testMotor(Wheel.BACK_LEFT, "Back Left", backLeftName.get());
-        Direction backRightDirection = testMotor(Wheel.BACK_RIGHT, "Back Right", backRightName.get());
+        Direction frontLeftDirection = testMotor(Wheel.FRONT_LEFT, "FrontLeft", frontLeftName.get());
+        Direction frontRightDirection = testMotor(Wheel.FRONT_RIGHT, "FrontRight", frontRightName.get());
+        Direction backLeftDirection = testMotor(Wheel.BACK_LEFT, "BackLeft", backLeftName.get());
+        Direction backRightDirection = testMotor(Wheel.BACK_RIGHT, "BackRight", backRightName.get());
 
-        result("frontLeftName", frontLeftName.get());
-        result("frontRightName", frontRightName.get());
-        result("backLeftName", backLeftName.get());
-        result("backRightName", backRightName.get());
-        result("frontLeftDirection", frontLeftDirection);
-        result("frontRightDirection", frontRightDirection);
-        result("backLeftDirection", backLeftDirection);
-        result("backRightDirection", backRightDirection);
+        result("FrontLeft", frontLeftName.get());
+        result("FrontRight", frontRightName.get());
+        result("BackLeft", backLeftName.get());
+        result("BackRight", backRightName.get());
+        result("FrontLeftDirection", frontLeftDirection);
+        result("FrontRightDirection", frontRightDirection);
+        result("BackLeftDirection", backLeftDirection);
+        result("BackRightDirection", backRightDirection);
 
         code(Language.JAVA, "public static MecanumConfig drivetrainConfig = new MecanumConfig(c -> {\n" +
                 "    c.frontLeftName.set(\"" + frontLeftName.get() + "\");\n" +
@@ -94,3 +94,4 @@ class SpinMotor extends TuningOpMode<Void> {
         return null;
     }
 }
+
