@@ -9,7 +9,11 @@ PLEASE READ *Mechatrons Programmers*
 
 1. Clone (done once to copy this file)
 2. Everytime there is a change = commit
-3. Push the code for the other person to pull the code. 
+3. Push the code for the other person to pull the code.
+
+(Plan) 
+
+idk finish teleOp and begin the tests and do the localizer.
 
 ## Requirements
 To use this Android Studio project, you will need Android Studio Ladybug (2024.2) or later.
