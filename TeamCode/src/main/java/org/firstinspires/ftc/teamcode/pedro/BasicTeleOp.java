@@ -45,7 +45,7 @@ public class BasicTeleOp extends OpMode {
 
         if (gamepad2.right_trigger > 0.1) {
             rightouttake.setPower(1.0);
-        } else if (gamepad2.right_trigger > 0.1) {
+        } else if (gamepad2.x) {
             rightouttake.setPower(-1.0);
         } else {
             rightouttake.setPower(0.0);
@@ -53,7 +53,7 @@ public class BasicTeleOp extends OpMode {
 
         if (gamepad2.left_trigger > 0.1) {
             leftouttake.setPower(1.0);
-        } else if (gamepad2.left_trigger > 0.1) {
+        } else if (gamepad2.triangle) {
             leftouttake.setPower(-1.0);
         } else {
             leftouttake.setPower(0.0);
