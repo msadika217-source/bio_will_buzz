@@ -5,6 +5,7 @@ import com.pedropathing.drivetrain.DrivePowers;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.sun.source.tree.WhileLoopTree;
 
 @TeleOp(name = "Basic TeleOp", group = "Drive")
 public class BasicTeleOp extends OpMode {
@@ -29,8 +30,8 @@ public class BasicTeleOp extends OpMode {
         drivetrain.drive(
                 new DrivePowers(
                         -gamepad1.left_stick_y, // Forward/backward
-                        gamepad1.left_stick_x,  // Strafe left/right
-                        gamepad1.right_stick_x  // Turn left/right
+                        -gamepad1.left_stick_x,  // Strafe left/right
+                        -gamepad1.right_stick_x  // Turn left/right
                 ),
                 true // manual drive mode
         );
