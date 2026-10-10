@@ -5,6 +5,7 @@ import com.pedropathing.drivetrain.DrivePowers;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "One Teleop", group = "Drive")
 public class OneTeleOp extends OpMode {
@@ -14,12 +15,16 @@ public class OneTeleOp extends OpMode {
     private DcMotor leftouttake;
     private DcMotor rightouttake;
 
+    private Servo lift;
+
     @Override
     public void init() {
         drivetrain = new Mecanum(hardwareMap, Constants.drivetrainConfig);
         intake = hardwareMap.get(DcMotor.class, "intake");
         leftouttake = hardwareMap.get(DcMotor.class,"leftouttake" );
         rightouttake = hardwareMap.get(DcMotor.class,"rightouttake" );
+        lift = hardwareMap.get(Servo.class ,"lift");
+
 
 
     }
