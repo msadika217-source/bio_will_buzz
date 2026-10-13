@@ -19,10 +19,11 @@ public class BasicTeleOp extends OpMode {
 
     @Override
     public void init() {
+
         drivetrain = new Mecanum(hardwareMap, Constants.drivetrainConfig);
         intake = hardwareMap.get(DcMotor.class, "intake");
-        /*leftouttake = hardwareMap.get(DcMotor.class,"leftouttake" );*/
-        /*rightouttake = hardwareMap.get(DcMotor.class,"rightouttake" );*/
+        leftouttake = hardwareMap.get(DcMotor.class,"leftouttake" );
+        rightouttake = hardwareMap.get(DcMotor.class,"rightouttake" );
     }
 
     @Override
@@ -44,21 +45,21 @@ public class BasicTeleOp extends OpMode {
             intake.setPower(0.0);
         }
 
-        /*if (gamepad2.right_trigger > 0.1) {
+        if (gamepad2.right_trigger > 1.0) {
             rightouttake.setPower(1.0);
         } else if (gamepad2.x) {
-            rightouttake.setPower(-1.0);
-        } else {
             rightouttake.setPower(0.0);
-        }*/
+        } else {
+            rightouttake.setPower(1.0);
+        }
 
-        /*if (gamepad2.left_trigger > 0.1) {
+        if (gamepad2.left_trigger > 1.0) {
             leftouttake.setPower(1.0);
         } else if (gamepad2.triangle) {
-            leftouttake.setPower(-1.0);
-        } else {
             leftouttake.setPower(0.0);
-        }*/
+        } else {
+            leftouttake.setPower(1.0);
+        }
 
 
 

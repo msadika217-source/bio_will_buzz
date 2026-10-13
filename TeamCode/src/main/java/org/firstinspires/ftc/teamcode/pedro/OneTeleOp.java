@@ -23,7 +23,7 @@ public class OneTeleOp extends OpMode {
         intake = hardwareMap.get(DcMotor.class, "intake");
         leftouttake = hardwareMap.get(DcMotor.class,"leftouttake" );
         rightouttake = hardwareMap.get(DcMotor.class,"rightouttake" );
-        lift = hardwareMap.get(Servo.class ,"lift");
+        /*lift = hardwareMap.get(Servo.class ,"lift");*/
 
 
 
@@ -49,19 +49,19 @@ public class OneTeleOp extends OpMode {
         }
 
         if (gamepad1.right_trigger > 0.1) {
-            rightouttake.setPower(1.0);
-        } else if (gamepad1.x) {
             rightouttake.setPower(-1.0);
-        } else {
+        } else if (gamepad1.x) {
             rightouttake.setPower(0.0);
+        } else {
+            rightouttake.setPower(-1.0);
         }
 
         if (gamepad1.left_trigger > 0.1) {
             leftouttake.setPower(1.0);
         } else if (gamepad1.triangle) {
-            leftouttake.setPower(-1.0);
-        } else {
             leftouttake.setPower(0.0);
+        } else {
+            leftouttake.setPower(1.0);
         }
 
     }
