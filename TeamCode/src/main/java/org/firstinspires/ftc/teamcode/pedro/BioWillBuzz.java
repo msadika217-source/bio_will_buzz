@@ -5,15 +5,16 @@ import com.pedropathing.drivetrain.DrivePowers;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-@TeleOp(name = "Basic TeleOp", group = "Drive")
-public class BasicTeleOp extends OpMode {
+@TeleOp(name = "BioBuzz TeleOp", group = "Drive")
+public class BioWillBuzz extends OpMode {
 
     private Mecanum drivetrain;
     private DcMotor intake;
     private DcMotor leftouttake;
     private DcMotor rightouttake;
+    private ServoImplEx flowerArm;
     /*private Servo lift;*/
     /*private Servo ramp;*/
 
@@ -30,8 +31,8 @@ public class BasicTeleOp extends OpMode {
     public void loop() {
         drivetrain.drive(
                 new DrivePowers(
-                        -gamepad1.left_stick_y, // Forward/backward
-                        -gamepad1.left_stick_x,  // Strafe left/right
+                        gamepad1.left_stick_y, // Forward/backward
+                        gamepad1.left_stick_x,  // Strafe left/right
                         -gamepad1.right_stick_x  // Turn left/right
                 ),
                 true // manual drive mode
@@ -54,18 +55,15 @@ public class BasicTeleOp extends OpMode {
         }
 
         if (gamepad2.left_trigger > 1.0) {
-            leftouttake.setPower(1.0);
+            leftouttake.setPower(0.55);
         } else if (gamepad2.triangle) {
             leftouttake.setPower(0.0);
         } else {
-            leftouttake.setPower(1.0);
+            leftouttake.setPower(0.55);
         }
 
 
 
-        /* add the button for the ramp */
-
-        /* lowkey  */
 
 
     }
