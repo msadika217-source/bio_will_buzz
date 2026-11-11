@@ -7,13 +7,19 @@ This GitHub repository contains the source code that is used to build an Android
 
 PLEASE READ *Mechatrons Programmers* 
 
-1. Clone (done once to copy this file)
+1. Clone (done once to copy this file) 
 2. Everytime there is a change = commit
 3. Push the code for the other person to pull the code.
+4. REMEMBER you must have pedropathing downloaded. 
 
 (Plan) 
 
-idk finish teleOp and begin the tests and do the localizer.
+1. finish teleop w axons
+2. start two wheel tuner
+3. follower
+4. localizer
+5. limelight
+6. autooo
 
 ## Requirements
 To use this Android Studio project, you will need Android Studio Ladybug (2024.2) or later.
