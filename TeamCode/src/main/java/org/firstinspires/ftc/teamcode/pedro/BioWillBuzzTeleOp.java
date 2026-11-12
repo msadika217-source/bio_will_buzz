@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 @TeleOp(name = "BioBuzz TeleOp", group = "Drive")
-public class BioWillBuzz extends OpMode {
+public class BioWillBuzzTeleOp extends OpMode {
 
     private Mecanum drivetrain;
     private DcMotor intake;

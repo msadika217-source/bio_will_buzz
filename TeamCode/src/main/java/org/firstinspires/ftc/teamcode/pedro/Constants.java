@@ -39,6 +39,9 @@ public class Constants {
         c.offsetUnits.set(DistanceUnit.INCH);
     });
 
+    public static Follower create(HardwareMap hardwareMap) {
+    }
+
 
 //im gonna jump off a cliff it ts don't flipping work//
 
