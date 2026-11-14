@@ -26,10 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  * CONTROLS
  *   Left stick                : drive (robot-centric: up = the way the robot faces)
  *   Right stick               : turn
- *   Square / Circle           : intake in / out (full power)
- *                               While SHOOTING (stopper open + flywheel on) Square feeds the balls
- *                               into the flywheel one at a time instead: slower, and it waits for
- *                               the wheel to get back to speed between balls.
+ *   Square / Circle           : intake in / out (100% power, always - also feeds the balls when shooting)
  *   HOLD Cross                : AUTO-AIM - turns the robot to the HIVE (left stick still drives)
  *   R1 (right bumper)         : flywheel ON  -> runs at SHOOT_RPM
  *   D-pad DOWN                : flywheel OFF -> coasts to a stop
@@ -42,7 +39,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  * TO SHOOT: R1 (flywheel) -> hold Cross (aim) -> D-pad UP (stopper open, green) -> hold Square (feed).
  * Controller rumbles when the robot is AIMED and the flywheel is AT SPEED = shoot.
  * The flywheel does NOT start on its own. It only runs after R1.
- * Drive, aim, flywheel and the shooting feed are battery-compensated: they act the same on a full or
+ * Drive, aim and flywheel are battery-compensated: they act the same on a full or
  * tired battery (down to about 12 V - below that there is no spare power left to make up with).
  *
  * ONLY EDIT THE "SETTINGS" BLOCK BELOW.
@@ -81,9 +78,11 @@ public class AxonTeleOp extends OpMode {
     static final double CAMERA_HEIGHT_IN      = 16.0;
     static final double UP_CELL_MIN_HEIGHT_IN = 41.0;   // a lone cluster above this = upward CELL
 
-    // Flower arm positions (0.0 to 1.0) for the NEW flower intake, found with "Flower Arm Finder" (Nov 5).
-    static final double ARM_UP   = 0.810;  // stowed, inside 18 in - the arm always STARTS here
-    static final double ARM_DOWN = 0.240;  // ramp under the Flower
+    // Flower arm positions (0.0 to 1.0), found with "Flower Arm Finder".
+    // Nov 13: re-measured after the arm stopped going all the way down. Both moved by the same
+    // 0.120 (was UP 0.810 / DOWN 0.240, measured Nov 5), which is what a skipped gear tooth looks like.
+    static final double ARM_UP   = 0.690;  // stowed, inside 18 in - the arm always STARTS here
+    static final double ARM_DOWN = 0.120;  // ramp under the Flower
 
     // ---- Stopper: goBILDA 2000 Series torque servo (25-2) in standard (position) mode ----
     // It goes to a position and holds it by itself. Find both numbers with "Axon Position Finder"
@@ -95,6 +94,7 @@ public class AxonTeleOp extends OpMode {
 
     // ---- RGB indicator (goBILDA 3118-0808-0002): colour is set like a servo position ----
     static final String RGB_NAME  = "rgbLight";      // Control Hub servo port 0, type: Servo
+    static final String RGB2_NAME = "rgblight2";     // Expansion Hub servo port 0, type: Servo. Same colours as rgbLight.
     static final double RGB_RED   = 0.309;           // measured with Position Finder (A) on this light
     static final double RGB_GREEN = 0.489;           // measured with Position Finder (A) on this light
 
@@ -144,14 +144,8 @@ public class AxonTeleOp extends OpMode {
     static final double BALL_DETECT_DROP_RPM = 60;     // ball log: a sudden drop this big = a ball was shot
     static final double BALL_DETECT_RISE_RPM = 30;     // ball log: wheel climbing back this much = ready for the next
 
-    // ---- Paced feed: what Square does while SHOOTING (stopper open + flywheel on) ----
-    // If balls are pushed in faster than the flywheel can get back to speed, each one leaves slower
-    // than the one before (first ball long, last ball short). So while shooting, Square feeds slower
-    // and waits for the wheel. Any other time Square is the plain full-power intake, as always.
-    // The "Ball speeds" line on the screen shows whether every ball got the same wheel speed.
-    static final double FEED_POWER        = 0.40;      // Square's power while shooting (as if at 12 V). Balls stall -> raise. Shots still uneven -> lower.
-    static final double FEED_READY_RPM    = 50;        // only pushes the next ball when the wheel is within this many RPM
-    static final double FEED_MAX_WAIT_SEC = 0.60;      // ...but never waits longer than this, so the intake can never get stuck
+    // (Nov 13: the paced feed was taken out. The intake is plain 100% power, always.)
+    static final double FEED_READY_RPM    = 50;        // not used by the intake any more (Flywheel.readyToFeed() still reads it)
     // ========================================================
 
     private Mecanum drivetrain;
@@ -171,7 +165,6 @@ public class AxonTeleOp extends OpMode {
     private double armTarget = ARM_UP;
     private boolean wasReady = false;
     private boolean wasStopperOpen = false;
-    private final ElapsedTime feedWait = new ElapsedTime();   // how long the feed has been waiting for the flywheel
     private final ElapsedTime sinceRumble = new ElapsedTime();
     private String feedText = "";
     private int loopCount = 0;
@@ -244,9 +237,10 @@ public class AxonTeleOp extends OpMode {
         hive.update();
 
         // ---- Drive (robot-centric) ----
-        // Signs tested on this robot: forward = left_stick_y, strafe = left_stick_x.
-        double forward = gamepad1.left_stick_y;
-        double strafe  = gamepad1.left_stick_x;
+        // Signs tested on this robot (Nov 13, after the drive motor names were swapped for Pedro):
+        // forward = -left_stick_y, strafe = -left_stick_x. (Before Nov 13 both were + .)
+        double forward = -gamepad1.left_stick_y;
+        double strafe  = -gamepad1.left_stick_x;
         double turn    = -gamepad1.right_stick_x;
         if (DRIVE_VOLTAGE_COMP) {
             forward *= battery.scale();
@@ -293,32 +287,16 @@ public class AxonTeleOp extends OpMode {
         if (stopper.isOpen() && !wasStopperOpen) flywheel.resetBallLog();   // new volley -> fresh ball log
         wasStopperOpen = stopper.isOpen();
 
-        // ---- Intake: Square in, Circle out (same buttons as always) ----
-        // While SHOOTING (stopper open + flywheel on) Square becomes a paced feed: slower,
-        // battery-compensated, and it waits for the flywheel to be back at speed before pushing the
-        // next ball. It never waits longer than FEED_MAX_WAIT_SEC, so the intake cannot get stuck.
-        // Any other time Square is the plain full-power intake.
-        boolean shooting = stopper.isOpen() && flywheelOn;
-        if (gamepad1.square && shooting) {
-            boolean wheelLow = !flywheel.readyToFeed();
-            if (!wheelLow) feedWait.reset();
-            boolean waiting = wheelLow && feedWait.seconds() < FEED_MAX_WAIT_SEC;
-            intake.setPower(waiting ? 0.0 : Math.min(1.0, FEED_POWER * battery.scale()));
-            feedText = waiting ? "Square: SHOOTING - waiting for the flywheel"
-                    : wheelLow ? "Square: SHOOTING - feeding anyway (flywheel is not reaching speed)"
-                    : "Square: SHOOTING - feeding one ball at a time";
+        // ---- Intake: Square in, Circle out (100% power, always runs, even with the flywheel on) ----
+        if (gamepad1.square) {
+            intake.setPower(1.0);
+            feedText = "Square: in (100% power)";
+        } else if (gamepad1.circle) {
+            intake.setPower(-1.0);
+            feedText = "Circle: out (100% power)";
         } else {
-            feedWait.reset();
-            if (gamepad1.square) {
-                intake.setPower(1.0);
-                feedText = "Square: in (full power)";
-            } else if (gamepad1.circle) {
-                intake.setPower(-1.0);
-                feedText = "Circle: out";
-            } else {
-                intake.setPower(0.0);
-                feedText = "off";
-            }
+            intake.setPower(0.0);
+            feedText = "off";
         }
 
         // ---- Flower arm: R2 down, L2 up ----
@@ -344,7 +322,7 @@ public class AxonTeleOp extends OpMode {
                 flywheel.biggestDipRpm(), flywheel.recoveries());
         telemetry.addData("Ball speeds", flywheel.ballLog());
         telemetry.addData("Intake", feedText);
-        telemetry.addData("Code version", "Nov 9: fast speed hold + paced feed on Square");
+        telemetry.addData("Code version", "Nov 13: flower arm 0.690 / 0.120");
         if (!aim.imuOk()) telemetry.addData("Gyro", USE_GYRO ? "NOT WORKING - aim is camera-only" : "off - aim is camera-only");
         telemetry.addData("Flower arm", armTarget == ARM_UP ? "UP" : "DOWN");
         telemetry.addData("Stopper", stopper.status() + "   (D-pad UP)");
